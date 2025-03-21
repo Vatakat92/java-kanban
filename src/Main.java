@@ -1,71 +1,52 @@
-package task;
+import manager.TaskManager;
+import task.Epic;
+import task.Status;
+import task.Subtask;
+import task.Task;
 
-import java.util.Objects;
+public class Main {
+    public static void main(String[] args) {
+        TaskManager taskManager = new TaskManager();
+        taskManager.addTask(new Task("Задача 1", "Описание задачи 1"));
+        taskManager.addTask(new Task("Задача 2", "Описание задачи 2"));
+        Epic epicA = new Epic("Эпик 1","Описание эпика 1");
+        Subtask subtaskA = new Subtask("Подзадача 1","Описание подзадачи 1");
+        Subtask subtaskB = new Subtask("Подзадача 2","Описание подзадачи 2");
+        taskManager.addEpic(epicA);
+        taskManager.addSubtasks(subtaskA);
+        taskManager.addSubtasks(subtaskB);
+        epicA.addSubtask(subtaskA);
+        epicA.addSubtask(subtaskB);
+        subtaskA.setEpicId(epicA.getId());
+        subtaskB.setEpicId(epicA.getId());
+        Epic epicB = new Epic("Эпик 2","Описание эпика 2");
+        Subtask subtaskC = new Subtask("Подзадача 3","Описание подзадачи 3");
+        taskManager.addEpic(epicB);
+        taskManager.addSubtasks(subtaskC);
+        epicB.addSubtask(subtaskC);
+        subtaskC.setEpicId(epicB.getId());
 
-import static task.Status.NEW;
+        System.out.println(taskManager.getTasks());
+        System.out.println(taskManager.getEpics());
+        System.out.println(taskManager.getSubtasks());
 
-public class Task {
-    private final Integer id;
-    private String name;
-    private String description;
-    private Status status;
-    protected static Integer globalId = 1;
+        taskManager.getTaskById(2).setStatus(Status.IN_PROGRESS);
+        taskManager.getSubtaskById(4).setStatus(Status.IN_PROGRESS);
+        taskManager.getEpicById(taskManager.getSubtaskById(4).getEpicId()).updateStatus();
+        taskManager.getSubtaskById(7).setStatus(Status.DONE);
+        taskManager.getEpicById(taskManager.getSubtaskById(7).getEpicId()).updateStatus();
 
-    public Task(String name, String description) {
-        this.name = name;
-        this.description = description;
-        status = NEW;
-        id = globalId++;
-    }
+        System.out.println(taskManager.getTasks());
+        System.out.println(taskManager.getEpics());
+        System.out.println(taskManager.getSubtasks());
 
-    public int getId() {
-        return id;
-    }
+        taskManager.removeTaskById(2);
+        taskManager.removeSubtaskById(4);
+        taskManager.removeEpicById(6);
 
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Task task = (Task) o;
-        return id.equals(task.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return "{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", status=" + status +
-                '}';
+        System.out.println(taskManager.getTasks());
+        System.out.println(taskManager.getEpics());
+        System.out.println(taskManager.getSubtasks());
     }
 
 }

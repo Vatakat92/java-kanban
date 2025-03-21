@@ -5,21 +5,25 @@ import java.util.Objects;
 import static task.Status.NEW;
 
 public class Task {
-    private final Integer id;
-    private String name;
-    private String description;
-    private Status status;
-    protected static Integer globalId = 1;
+    private Integer id;
+    protected String name;
+    protected String description;
+    protected Status status;
+
 
     public Task(String name, String description) {
         this.name = name;
         this.description = description;
         status = NEW;
-        id = globalId++;
+        this.id = 0;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
+    }
+
+    public void setId(Integer id){
+        this.id = id;
     }
 
     public String getName() {
