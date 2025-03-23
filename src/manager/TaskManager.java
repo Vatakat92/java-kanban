@@ -33,10 +33,13 @@ public class TaskManager {
     }
 
     public void addSubtasks(Subtask subtask) {
-
         subtask.setId(globalId);
         subtasks.put(globalId, subtask);
         globalId++;
+        Epic epic = epics.get(subtask.getEpicId());
+        epic.addSubtask(subtask);
+        epics.get(subtask.getEpicId()).updateStatus();
+
     }
 
     public void removeTaskById(Integer id) {
