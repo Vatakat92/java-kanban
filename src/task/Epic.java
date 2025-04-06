@@ -4,47 +4,48 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
-    private List<Subtask> subtasks;
+    private final List<Integer> subtasks;
 
     public Epic(String name, String description) {
         super(name, description);
         subtasks = new ArrayList<>();
     }
 
-    public List<Subtask> getSubtasks() {
+    public Epic(Epic epic) {
+        super(epic.getName(), epic.getDescription(), epic.getStatus(), epic.getId());
+        subtasks = epic.getSubtasksId();
+    }
+
+    public List<Integer> getSubtasksId() {
         return subtasks;
     }
 
-    public void addSubtask(Subtask subtask) {
-        subtasks.add(subtask);
+    public void addSubtask(Integer id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Не должно быть равно нулю.");
+        }
+        if (id.equals(this.getId())) {
+            throw new IllegalArgumentException("Неправильная операция: " +
+                    "эпик не может быть своей же подзадачей");
+        }
+        if (subtasks.contains(id)) {
+            return;
+        }
+        subtasks.add(id);
     }
 
-    public void deleteSubTask(Subtask subtask){
-        subtasks.remove(subtask);
-        updateStatus();
+    public void deleteSubTask(Integer id){
+        subtasks.remove(id);
     }
 
-    public void updateStatus() {
-        int allInProgress = 0;
-        int allDone = 0;
-
-        for (Subtask subtask : subtasks) {
-            if (subtask.getStatus() == Status.IN_PROGRESS) {
-                allInProgress++;
-            }
-            if (subtask.getStatus() == Status.DONE) {
-                allDone++;
-            }
-
-        }
-        if (allDone > 0 && allDone == subtasks.size()) {
-            setStatus(Status.DONE);
-        } else if (allInProgress>0 || allDone>0 ) {
-            setStatus(Status.IN_PROGRESS);
-
-        }else{
-            setStatus(Status.NEW);
-        }
-
+    @Override
+    public String toString() {
+        return "Epic{" +
+                "Name:" + this.getName() + " \\ " +
+                this.getDescription() +
+                "|ID:" + this.getId() +
+                "|Status:" + this.getStatus() +
+                "|SubTask:" + subtasks +
+                "}";
     }
 }

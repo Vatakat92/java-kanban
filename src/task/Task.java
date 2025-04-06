@@ -15,7 +15,21 @@ public class Task {
         this.name = name;
         this.description = description;
         status = NEW;
-        this.id = 0;
+        id = 0;
+    }
+
+    public Task(String name, String description, Status status, Integer id) {
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        this.id = id;
+    }
+
+    public Task(Task task) {
+        this.name = task.getName();
+        this.description = task.getDescription();
+        this.status = task.getStatus();
+        this.id = task.getId();
     }
 
     public Integer getId() {
@@ -65,11 +79,13 @@ public class Task {
 
     @Override
     public String toString() {
-        return "{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", status=" + status +
-                '}';
+        return "Task{" +
+                "Name:" + name + " \\ " +
+                description +
+                "|id:" + id +
+                "|Status:" + status +
+                "}";
     }
 
 }
+

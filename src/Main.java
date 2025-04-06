@@ -1,3 +1,4 @@
+import manager.Managers;
 import manager.TaskManager;
 import task.Epic;
 import task.Status;
@@ -5,44 +6,58 @@ import task.Subtask;
 import task.Task;
 
 public class Main {
+
     public static void main(String[] args) {
-        TaskManager taskManager = new TaskManager();
-        taskManager.addTask(new Task("Задача 1", "Описание задачи 1"));
-        taskManager.addTask(new Task("Задача 2", "Описание задачи 2"));
-        Epic epicA = new Epic("Эпик 1","Описание эпика 1");
-        Subtask subtaskA = new Subtask("Подзадача 1","Описание подзадачи 1");
-        Subtask subtaskB = new Subtask("Подзадача 2","Описание подзадачи 2");
-        taskManager.addEpic(epicA);
-        subtaskA.setEpicId(epicA.getId());
-        subtaskB.setEpicId(epicA.getId());
-        taskManager.addSubtasks(subtaskA);
-        taskManager.addSubtasks(subtaskB);
-        Epic epicB = new Epic("Эпик 2","Описание эпика 2");
-        Subtask subtaskC = new Subtask("Подзадача 3","Описание подзадачи 3");
-        taskManager.addEpic(epicB);
-        subtaskC.setEpicId(epicB.getId());
-        taskManager.addSubtasks(subtaskC);
-        System.out.println(taskManager.getTasks());
-        System.out.println(taskManager.getEpics());
-        System.out.println(taskManager.getSubtasks());
+        TaskManager manager = Managers.getDefault();
+        
+        Task taskA = new Task("Задача A", "Описание задачи A");
+        Task taskB = new Task("Задача B", "Описание задачи B");
+        Epic epicA = new Epic("Эпик A", "Описание эпика A");
+        Epic epicB = new Epic("Эпик B", "Описание эпика B");
+        Subtask subA = new Subtask("Подзадача A эпика A", "Описание подзадачи A");
+        Subtask subB = new Subtask("Подзадача B эпика A", "Описание подзадачи B");
+        Subtask subC = new Subtask("Подзадача A эпика B", "Описание подзадачи A");
 
-        taskManager.getTaskById(2).setStatus(Status.IN_PROGRESS);
-        taskManager.getSubtaskById(4).setStatus(Status.IN_PROGRESS);
-        taskManager.getEpicById(taskManager.getSubtaskById(4).getEpicId()).updateStatus();
-        taskManager.getSubtaskById(7).setStatus(Status.DONE);
-        taskManager.getEpicById(taskManager.getSubtaskById(7).getEpicId()).updateStatus();
+        manager.addTask(taskA);
+        manager.addTask(taskB);
+        manager.addEpic(epicA);
+        manager.addEpic(epicB);
+        manager.addSubtasks(subA);
+        manager.addSubtasks(subB);
+        manager.addSubtasks(subC);
 
-        System.out.println(taskManager.getTasks());
-        System.out.println(taskManager.getEpics());
-        System.out.println(taskManager.getSubtasks());
+        manager.getEpicById(epicA.getId()).addSubtask(subA.getId());
+        manager.getEpicById(epicA.getId()).addSubtask(subB.getId());
+        manager.getEpicById(epicB.getId()).addSubtask(subC.getId());
+        manager.getSubtaskById(subA.getId()).setEpicId(epicA.getId());
+        manager.getSubtaskById(subB.getId()).setEpicId(epicA.getId());
+        manager.getSubtaskById(subC.getId()).setEpicId(epicB.getId());
+        manager.updateEpic(manager.getEpicById(epicA.getId()));
+        manager.updateEpic(manager.getEpicById(epicB.getId()));
 
-        taskManager.removeTaskById(2);
-        taskManager.removeSubtaskById(4);
-        taskManager.removeEpicById(6);
+        System.out.println("Шаг 1: Инициализация");
+        for (Task task : manager.getTasksIdList()) System.out.println(task);
+        for (Epic epic : manager.getEpicsIdList()) System.out.println(epic);
+        for (Subtask sub : manager.getSubtasksIdList()) System.out.println(sub);
 
-        System.out.println(taskManager.getTasks());
-        System.out.println(taskManager.getEpics());
-        System.out.println(taskManager.getSubtasks());
+        manager.getTaskById(taskA.getId()).setStatus(Status.IN_PROGRESS);
+        manager.getSubtaskById(subA.getId()).setStatus(Status.IN_PROGRESS);
+        manager.updateEpic(manager.getEpicById(epicA.getId()));
+        manager.getSubtaskById(subC.getId()).setStatus(Status.DONE);
+        manager.updateEpic(manager.getEpicById(epicB.getId()));
+
+        System.out.println("\nШаг 2: Изменение статусов");
+        for (Task task : manager.getTasksIdList()) System.out.println(task);
+        for (Epic epic : manager.getEpicsIdList()) System.out.println(epic);
+        for (Subtask sub : manager.getSubtasksIdList()) System.out.println(sub);
+
+        manager.removeTaskById(taskB.getId());
+        manager.removeSubtaskById(subA.getId());
+        manager.removeEpicById(epicB.getId());
+
+        System.out.println("\nШаг 3: Удаление задач");
+        for (Task task : manager.getTasksIdList()) System.out.println(task);
+        for (Epic epic : manager.getEpicsIdList()) System.out.println(epic);
+        for (Subtask sub : manager.getSubtasksIdList()) System.out.println(sub);
     }
-
 }
