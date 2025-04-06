@@ -10,6 +10,10 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void add(Task task) {
+
+        // По условиям ТЗ мы должны провести этот тест:
+        // -убедитесь, что задачи, добавляемые в HistoryManager, сохраняют предыдущую версию задачи и её данных.
+        // Без того как это делается сейчас сделать будет затруднительно, если невозможно.
         history.add(new Task(task));
         if (history.size() > MAX_SIZE) {
             history.removeFirst();

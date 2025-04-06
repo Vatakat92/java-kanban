@@ -14,6 +14,9 @@ public class SubtaskTest {
         subA = new Subtask("Подзадача A", "Описание подзадачи A");
         subB = new Subtask("Подзадача B", "Описание подзадачи B");
         epicA = new Epic("Эпик", "Описание эпика");
+        subA.setId(3);
+        subB.setId(2);
+        epicA.setId(1);
     }
 
     @Test

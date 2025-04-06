@@ -16,9 +16,9 @@ public interface TaskManager {
     void removeEpicById(Integer id);
     void removeSubtaskById(Integer id);
 
-    ArrayList<Task> getTasksIdList();
-    ArrayList<Epic> getEpicsIdList();
-    ArrayList<Subtask> getSubtasksIdList();
+    List<Task> getTasksIdList();
+    List<Epic> getEpicsIdList();
+    List<Subtask> getSubtasksIdList();
 
     Task getTaskById(Integer id);
     Epic getEpicById(Integer id);

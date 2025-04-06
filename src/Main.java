@@ -5,6 +5,8 @@ import task.Status;
 import task.Subtask;
 import task.Task;
 
+import java.util.ArrayList;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -36,9 +38,9 @@ public class Main {
         manager.updateEpic(manager.getEpicById(epicB.getId()));
 
         System.out.println("Шаг 1: Инициализация");
-        for (Task task : manager.getTasksIdList()) System.out.println(task);
-        for (Epic epic : manager.getEpicsIdList()) System.out.println(epic);
-        for (Subtask sub : manager.getSubtasksIdList()) System.out.println(sub);
+        for (Task task : (ArrayList<Task>) manager.getTasksIdList()) System.out.println(task);
+        for (Epic epic : (ArrayList<Epic>) manager.getEpicsIdList()) System.out.println(epic);
+        for (Subtask sub : (ArrayList<Subtask>) manager.getSubtasksIdList()) System.out.println(sub);
 
         manager.getTaskById(taskA.getId()).setStatus(Status.IN_PROGRESS);
         manager.getSubtaskById(subA.getId()).setStatus(Status.IN_PROGRESS);
@@ -47,17 +49,17 @@ public class Main {
         manager.updateEpic(manager.getEpicById(epicB.getId()));
 
         System.out.println("\nШаг 2: Изменение статусов");
-        for (Task task : manager.getTasksIdList()) System.out.println(task);
-        for (Epic epic : manager.getEpicsIdList()) System.out.println(epic);
-        for (Subtask sub : manager.getSubtasksIdList()) System.out.println(sub);
+        for (Task task : (ArrayList<Task>) manager.getTasksIdList()) System.out.println(task);
+        for (Epic epic : (ArrayList<Epic>) manager.getEpicsIdList()) System.out.println(epic);
+        for (Subtask sub : (ArrayList<Subtask>) manager.getSubtasksIdList()) System.out.println(sub);
 
         manager.removeTaskById(taskB.getId());
         manager.removeSubtaskById(subA.getId());
         manager.removeEpicById(epicB.getId());
 
         System.out.println("\nШаг 3: Удаление задач");
-        for (Task task : manager.getTasksIdList()) System.out.println(task);
-        for (Epic epic : manager.getEpicsIdList()) System.out.println(epic);
-        for (Subtask sub : manager.getSubtasksIdList()) System.out.println(sub);
+        for (Task task : (ArrayList<Task>) manager.getTasksIdList()) System.out.println(task);
+        for (Epic epic : (ArrayList<Epic>) manager.getEpicsIdList()) System.out.println(epic);
+        for (Subtask sub : (ArrayList<Subtask>) manager.getSubtasksIdList()) System.out.println(sub);
     }
 }

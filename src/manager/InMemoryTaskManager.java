@@ -28,6 +28,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void addTask(Task task) {
         task.setId(createNewId());
+        // Можно не оборачивать однако теряется смысл методов updateTask, updateEpic и т.д.
+        // Более того если перезаписать объект задачи, это будет влиять на состояние
+        // менеджера, что не хорошо.
         tasks.put(task.getId(), new Task(task));
     }
 
@@ -158,6 +161,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (!epics.containsKey(epicId)) {
             throw new IllegalArgumentException("Эпика с ID (" + epicId + ") не зарегистрировано в менеджере");
         }
+
 
         if (epics.get(epicId).getSubtasksId().isEmpty()) {
             epics.get(epicId).setStatus(Status.NEW);
