@@ -28,22 +28,19 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void addTask(Task task) {
         task.setId(createNewId());
-        // Можно не оборачивать однако теряется смысл методов updateTask, updateEpic и т.д.
-        // Более того если перезаписать объект задачи, это будет влиять на состояние
-        // менеджера, что не хорошо.
-        tasks.put(task.getId(), new Task(task));
+        tasks.put(task.getId(), task);
     }
 
     @Override
     public void addEpic(Epic epic) {
         epic.setId(createNewId());
-        epics.put(epic.getId(), new Epic(epic));
+        epics.put(epic.getId(), epic);
     }
 
     @Override
     public void addSubtasks(Subtask subtask) {
         subtask.setId(createNewId());
-        subtasks.put(subtask.getId(), new Subtask(subtask));
+        subtasks.put(subtask.getId(), subtask);
     }
 
     @Override
@@ -53,7 +50,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeEpicById(Integer id) {
-        ArrayList<Integer> subTaskListId = new ArrayList<>(epics.get(id).getSubtasksId());
+        List<Integer> subTaskListId = new ArrayList<>(epics.get(id).getSubtasksId());
         for (Integer subTaskId : subTaskListId) {
             subtasks.remove(subTaskId);
         }
@@ -69,17 +66,17 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<Task> getTasksIdList() {
+    public List<Task> getTasksIdList() {
         return new ArrayList<>(tasks.values());
     }
 
     @Override
-    public ArrayList<Epic> getEpicsIdList() {
+    public List<Epic> getEpicsIdList() {
         return new ArrayList<>(epics.values());
     }
 
     @Override
-    public ArrayList<Subtask> getSubtasksIdList() {
+    public List<Subtask> getSubtasksIdList() {
         return new ArrayList<>(subtasks.values());
     }
 
