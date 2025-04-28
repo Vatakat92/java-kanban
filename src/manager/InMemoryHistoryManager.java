@@ -4,6 +4,7 @@ import task.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
@@ -75,8 +76,8 @@ public class InMemoryHistoryManager implements HistoryManager {
 
 
     @Override
-    public ArrayList<Task> getHistory() {
-        ArrayList<Task> historyOrdered = new ArrayList<>();
+    public List<Task> getHistory() {
+        List<Task> historyOrdered = new ArrayList<>();
 
         if (historyMap.isEmpty()) {
             return historyOrdered;

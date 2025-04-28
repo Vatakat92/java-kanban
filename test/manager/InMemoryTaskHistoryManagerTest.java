@@ -67,14 +67,14 @@ public class InMemoryTaskHistoryManagerTest {
 
     @Test
     void shouldMaintainUniqueTasksInHistoryWithLastAccessOrder() {
-        historyManager.add(taskA);
-        historyManager.add(taskB);
-        historyManager.add(taskC);
-        historyManager.add(taskC);
-        historyManager.add(taskB);
-        historyManager.add(taskA);
-        assertFalse(hasDuplicates(historyManager.getHistory()));
-        List<Task> expectedOrder = Arrays.asList(taskC, taskB, taskA);
+        List<Task> tasksToAdd = List.of(taskA, taskB, taskC, taskC, taskB, taskA);
+
+        for (Task task : tasksToAdd) {
+            historyManager.add(task);
+        }
+
+        assertFalse(hasDuplicates((ArrayList<Task>) historyManager.getHistory()));
+        List<Task> expectedOrder = List.of(taskC, taskB, taskA);
         assertEquals(expectedOrder, historyManager.getHistory());
     }
 
@@ -86,7 +86,7 @@ public class InMemoryTaskHistoryManagerTest {
         historyManager.remove(taskA.getId());
         historyManager.add(taskD);
         historyManager.remove(taskC.getId());
-        assertFalse(hasDuplicates(historyManager.getHistory()));
+        assertFalse(hasDuplicates((ArrayList<Task>) historyManager.getHistory()));
         List<Task> expectedOrder = Arrays.asList(taskB, taskD);
         assertEquals(expectedOrder, historyManager.getHistory());
     }
