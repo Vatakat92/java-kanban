@@ -12,20 +12,20 @@ public class Subtask extends Task {
         super(subtask.getName(), subtask.getDescription(), subtask.getStatus(), subtask.getId());
         epicId = subtask.getEpicId();
     }
-    
+
     public Integer getEpicId() {
         return epicId;
     }
 
-    public void setEpicId(Integer Id) {
-        if (Id.equals(this.getId())) {
+    public void setEpicId(Integer id) {
+        if (id.equals(this.getId())) {
             throw new IllegalArgumentException("Неверная операция: " +
                     "подзадача не может быть своим же эпиком");
         }
-        if (Id.equals(this.getEpicId())) {
+        if (id.equals(this.getEpicId())) {
             return;
         }
-        this.epicId = Id;
+        this.epicId = id;
     }
 
     @Override

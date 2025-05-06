@@ -11,7 +11,7 @@ public class Main {
 
     public static void main(String[] args) {
         TaskManager manager = Managers.getDefault();
-        
+
         Task taskA = new Task("Задача A", "Описание задачи A");
         Task taskB = new Task("Задача B", "Описание задачи B");
         Epic epicA = new Epic("Эпик A", "Описание эпика A");

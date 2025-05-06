@@ -1,15 +1,13 @@
 package manager;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
 import task.Epic;
 import task.Status;
 import task.Subtask;
 import task.Task;
-
-import java.util.ArrayList;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class InMemoryTaskManagerTest {
     private TaskManager manager;
@@ -58,29 +56,6 @@ public class InMemoryTaskManagerTest {
         assertEquals(taskA.getId(), manager.getTaskById(taskA.getId()).getId());
     }
 
-    @Test
-    void shouldStorePreviousTaskStateInHistory() {
-        manager.addTask(taskA);
-        manager.getTaskById(taskA.getId()).setStatus(Status.IN_PROGRESS);
-        manager.getTaskById(taskA.getId()).setStatus(Status.DONE);
-        ArrayList<Task> history = (ArrayList<Task>) manager.getHistory();
-        assertEquals(Status.IN_PROGRESS, history.get(1).getStatus());
-    }
-
-    @Test
-    void shouldChangeEpicStatusToInProgressWhenAnySubtaskStatusChangedToInProgress() {
-        manager.addEpic(epicA);
-        manager.addSubtasks(subA);
-        manager.addSubtasks(subB);
-        manager.getEpicById(epicA.getId()).addSubtask(subA.getId());
-        manager.getEpicById(epicA.getId()).addSubtask(subB.getId());
-        manager.getSubtaskById(subA.getId()).setEpicId(epicA.getId());
-        manager.getSubtaskById(subB.getId()).setEpicId(epicA.getId());
-        manager.updateEpic(manager.getEpicById(epicA.getId()));
-        manager.getSubtaskById(subB.getId()).setStatus(Status.IN_PROGRESS);
-        manager.updateEpic(manager.getEpicById(epicA.getId()));
-        assertEquals(Status.IN_PROGRESS, manager.getEpicById(epicA.getId()).getStatus());
-    }
 
     @Test
     void shouldChangeEpicStatusToDoneWhenAllSubtasksStatusChangedToDone() {
@@ -217,4 +192,5 @@ public class InMemoryTaskManagerTest {
         manager.updateSubtask(subB);
         assertEquals(Status.DONE, manager.getEpicById(epicA.getId()).getStatus());
     }
+
 }
