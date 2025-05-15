@@ -5,6 +5,7 @@ import java.util.Objects;
 import static task.Status.NEW;
 
 public class Task {
+    protected TaskType type;
     private Integer id;
     protected String name;
     protected String description;
@@ -14,6 +15,7 @@ public class Task {
     public Task(String name, String description) {
         this.name = name;
         this.description = description;
+        this.type = TaskType.TASK;
         status = NEW;
         id = 0;
     }
@@ -23,6 +25,7 @@ public class Task {
         this.description = description;
         this.status = status;
         this.id = id;
+        this.type = TaskType.TASK;
     }
 
     public Task(Task task) {
@@ -30,10 +33,15 @@ public class Task {
         this.description = task.getDescription();
         this.status = task.getStatus();
         this.id = task.getId();
+        this.type = TaskType.TASK;
     }
 
     public Integer getId() {
         return id;
+    }
+
+    public TaskType getType() {
+        return type;
     }
 
     public void setId(Integer id) {
