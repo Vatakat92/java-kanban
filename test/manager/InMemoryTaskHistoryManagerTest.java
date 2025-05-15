@@ -52,7 +52,7 @@ public class InMemoryTaskHistoryManagerTest {
     @Test
     void shouldMaintainImmutableHistoryWhenOriginalTaskIsModified() {
         historyManager.add(taskA);
-        taskA.setDescription("Описание задачи B изменена");
+        taskA.setDescription("Описание задачи B - изменена");
         assertNotEquals(historyManager.getHistory().getFirst().getDescription(), taskA.getDescription());
     }
 

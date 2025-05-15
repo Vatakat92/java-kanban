@@ -8,11 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
-
     private final Map<Integer, Node> historyMap;
     private Node firstNode;
     private Node lastNode;
-
 
     public InMemoryHistoryManager() {
         historyMap = new HashMap<>();
