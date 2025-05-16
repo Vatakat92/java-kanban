@@ -14,7 +14,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         this.file = file;
     }
 
-    protected void save() {
+    private void save() {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             writer.write("id,type,name,status,description,epic\n");
@@ -61,34 +61,28 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         FileBackedTaskManager manager = new FileBackedTaskManager(file);
 
         try {
-            String content = Files.readString(file.toPath());
-            String[] lines = content.split("\n");
+            for (String line : Files.readAllLines(file.toPath())) {
+                if (line.isEmpty() || line.startsWith("id,")) continue;
 
-            for (String line : lines) {
-                if (!line.startsWith("id,") && !line.isEmpty()) {
-                    Task task = fromString(line);
-                    if (task instanceof Epic) {
-                        manager.addEpic((Epic) task);
-                    } else if (task != null && !(task instanceof Subtask)) {
-                        manager.addTask(task);
+                Task task = fromString(line);
+                if (task == null) {
+                    System.err.println("Пропущена некорректная строка: " + line);
+                    continue;
+                }
+
+                if (task instanceof Epic epic) {
+                    manager.addEpic(epic);
+                } else if (task instanceof Subtask subtask) {
+                    Epic epic = manager.getEpicById(subtask.getEpicId());
+                    if (epic != null) {
+                        manager.addSubtasks(subtask);
+                        epic.addSubtask(subtask.getId());
+                        manager.updateStatus(epic.getId());
                     }
+                } else {
+                    manager.addTask(task);
                 }
             }
-
-            for (String line : lines) {
-                if (!line.startsWith("id,") && !line.isEmpty()) {
-                    Task task = fromString(line);
-                    if (task instanceof Subtask subtask) {
-                        if (manager.getEpicById(subtask.getEpicId()) != null) {
-                            manager.addSubtasks(subtask);
-                            Epic epic = manager.getEpicById(subtask.getEpicId());
-                            epic.addSubtask(subtask.getId());
-                            manager.updateStatus(epic.getId());
-                        }
-                    }
-                }
-            }
-
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка загрузки", e);
         }

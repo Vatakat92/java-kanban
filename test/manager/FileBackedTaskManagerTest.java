@@ -7,6 +7,7 @@ import task.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 
 class FileBackedTaskManagerTest {
@@ -18,6 +19,7 @@ class FileBackedTaskManagerTest {
         tempFile = File.createTempFile("tasks", ".csv");
         manager = new FileBackedTaskManager(tempFile);
     }
+
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @AfterEach
     void tearDown() {
@@ -28,7 +30,7 @@ class FileBackedTaskManagerTest {
 
     @Test
     void shouldWorkLikeInMemoryManagerForTasks() {
-        Task task = new Task("Task", "Description");
+        Task task = new Task("Задача", "Описание задачи");
         manager.addTask(task);
 
         Task savedTask = manager.getTaskById(task.getId());
@@ -41,20 +43,34 @@ class FileBackedTaskManagerTest {
     }
 
     @Test
-    void shouldSaveAndLoadEmptyManager() {
-        manager.save();
+    void shouldLoadEmptyManagerFromEmptyFile() throws IOException {
+        Files.write(tempFile.toPath(), "id,type,name,status,description,epic\n".getBytes());
+
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
 
-        assertTrue(loadedManager.getTasksIdList().isEmpty());
-        assertTrue(loadedManager.getEpicsIdList().isEmpty());
-        assertTrue(loadedManager.getSubtasksIdList().isEmpty());
-        assertTrue(loadedManager.getHistory().isEmpty());
+        assertTrue(loadedManager.getTasksIdList().isEmpty(),
+                "Список обычных задач должен быть пустым");
+
+        assertTrue(loadedManager.getEpicsIdList().isEmpty(),
+                "Список эпиков должен быть пустым");
+
+        assertTrue(loadedManager.getSubtasksIdList().isEmpty(),
+                "Список подзадач должен быть пустым");
+
+        assertTrue(loadedManager.getHistory().isEmpty(),
+                "История должна быть пустой");
+
+        List<String> fileContent = Files.readAllLines(tempFile.toPath());
+        assertEquals(1, fileContent.size(),
+                "Файл должен содержать только заголовок");
+        assertEquals("id,type,name,status,description,epic", fileContent.getFirst(),
+                "Неверный формат заголовка файла");
     }
 
     @Test
     void shouldSaveAndLoadMultipleTasks() {
-        Task task1 = new Task("Task 1", "Description 1");
-        Task task2 = new Task("Task 2", "Description 2");
+        Task task1 = new Task("Задача 1", "Описание задачи 1");
+        Task task2 = new Task("Задача 2", "Описание задачи 2");
         manager.addTask(task1);
         manager.addTask(task2);
 
@@ -68,14 +84,14 @@ class FileBackedTaskManagerTest {
 
     @Test
     void shouldSaveAndLoadEpicsWithSubtasks() {
-        Epic epic = new Epic("Epic", "Description");
+        Epic epic = new Epic("Эпик", "Описание эпика");
         manager.addEpic(epic);
 
-        Subtask subtask1 = new Subtask("Subtask 1", "Description 1");
+        Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1");
         subtask1.setEpicId(epic.getId());
         manager.addSubtasks(subtask1);
 
-        Subtask subtask2 = new Subtask("Subtask 2", "Description 2");
+        Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2");
         subtask2.setEpicId(epic.getId());
         subtask2.setStatus(Status.DONE);
         manager.addSubtasks(subtask2);
@@ -92,9 +108,9 @@ class FileBackedTaskManagerTest {
 
     @Test
     void shouldSaveAndLoadTaskWithDifferentStatuses() {
-        Task newTask = new Task("New", "Description", Status.NEW, 1);
-        Task inProgressTask = new Task("In Progress", "Description", Status.IN_PROGRESS, 2);
-        Task doneTask = new Task("Done", "Description", Status.DONE, 3);
+        Task newTask = new Task("New", "Описание задачи", Status.NEW, 1);
+        Task inProgressTask = new Task("In Progress", "Описание задачи", Status.IN_PROGRESS, 2);
+        Task doneTask = new Task("Done", "Описание задачи", Status.DONE, 3);
 
         manager.addTask(newTask);
         manager.addTask(inProgressTask);
@@ -122,13 +138,13 @@ class FileBackedTaskManagerTest {
 
     @Test
     void shouldAutoSaveOnAllOperations() {
-        Task task = new Task("Task", "Description");
+        Task task = new Task("Задача", "Описание задачи");
         manager.addTask(task);
 
-        Epic epic = new Epic("Epic", "Description");
+        Epic epic = new Epic("Эпик", "Описание эпика");
         manager.addEpic(epic);
 
-        Subtask subtask = new Subtask("Subtask", "Description");
+        Subtask subtask = new Subtask("Подзадача", "Описание подзадачи");
         subtask.setEpicId(epic.getId());
         manager.addSubtasks(subtask);
 
