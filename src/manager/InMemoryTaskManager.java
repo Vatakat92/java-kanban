@@ -11,13 +11,11 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
-
-    private Integer globalId;
-    private final HistoryManager historyManager = Managers.getDefaultHistory();
-
-    private final Map<Integer, Task> tasks;
-    private final Map<Integer, Epic> epics;
-    private final Map<Integer, Subtask> subtasks;
+    protected Integer globalId;
+    protected final HistoryManager historyManager = Managers.getDefaultHistory();
+    protected final Map<Integer, Task> tasks;
+    protected final Map<Integer, Epic> epics;
+    protected final Map<Integer, Subtask> subtasks;
 
     public InMemoryTaskManager() {
         tasks = new HashMap<>();
@@ -148,37 +146,36 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager.getHistory();
     }
 
-    private void updateStatus(Integer epicId) {
-        int countDoneTask = 0;
-        int countInProgressTask = 0;
+    protected void updateStatus(Integer epicId) {
+        Epic epic = epics.get(epicId);
+        if (epic == null) return;
 
-        if (epicId == null) {
-            throw new IllegalArgumentException("Id не может быть нулем");
-        }
-
-        if (!epics.containsKey(epicId)) {
-            throw new IllegalArgumentException("Эпика с ID (" + epicId + ") не зарегистрировано в менеджере");
-        }
-
-
-        if (epics.get(epicId).getSubtasksId().isEmpty()) {
-            epics.get(epicId).setStatus(Status.NEW);
+        if (epic.getSubtasksId().isEmpty()) {
+            epic.setStatus(Status.NEW);
             return;
         }
 
-        for (Integer subID : epics.get(epicId).getSubtasksId()) {
-            if (subtasks.containsKey(subID)) {
-                if (subtasks.get(subID).getStatus() == Status.IN_PROGRESS) countInProgressTask++;
-                if (subtasks.get(subID).getStatus() == Status.DONE) countDoneTask++;
+        boolean allDone = true;
+        boolean anyInProgress = false;
+
+        for (Integer subId : epic.getSubtasksId()) {
+            Subtask subtask = subtasks.get(subId);
+            if (subtask == null) continue;
+
+            if (subtask.getStatus() == Status.IN_PROGRESS) {
+                anyInProgress = true;
+            }
+            if (subtask.getStatus() != Status.DONE) {
+                allDone = false;
             }
         }
 
-        if (countDoneTask == epics.get(epicId).getSubtasksId().size()) {
-            epics.get(epicId).setStatus(Status.DONE);
-        } else if (countInProgressTask > 0) {
-            epics.get(epicId).setStatus(Status.IN_PROGRESS);
+        if (allDone) {
+            epic.setStatus(Status.DONE);
+        } else if (anyInProgress) {
+            epic.setStatus(Status.IN_PROGRESS);
         } else {
-            epics.get(epicId).setStatus(Status.NEW);
+            epic.setStatus(Status.NEW);
         }
     }
 
