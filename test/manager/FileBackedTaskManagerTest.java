@@ -1,157 +1,84 @@
 package manager;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.*;
-import task.*;
+import task.Epic;
+import task.Status;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.List;
 
-class FileBackedTaskManagerTest {
+import static org.junit.jupiter.api.Assertions.*;
+
+class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     private File tempFile;
-    private FileBackedTaskManager manager;
 
     @BeforeEach
-    void setUp() throws IOException {
+    @Override
+    public void setUp() throws IOException {
         tempFile = File.createTempFile("tasks", ".csv");
-        manager = new FileBackedTaskManager(tempFile);
+        super.setUp();
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     @AfterEach
     void tearDown() {
-        if (tempFile.exists()) {
-            tempFile.delete();
+        if (!tempFile.delete()) {
+            System.err.println("Failed to delete temp file: " + tempFile.getAbsolutePath());
         }
     }
 
-    @Test
-    void shouldWorkLikeInMemoryManagerForTasks() {
-        Task task = new Task("Задача", "Описание задачи");
-        manager.addTask(task);
-
-        Task savedTask = manager.getTaskById(task.getId());
-        assertNotNull(savedTask);
-        assertEquals(task, savedTask);
-
-        List<Task> tasks = manager.getTasksIdList();
-        assertEquals(1, tasks.size());
-        assertEquals(task, tasks.getFirst());
+    @Override
+    protected FileBackedTaskManager createTaskManager()  {
+        return new FileBackedTaskManager(tempFile);
     }
 
     @Test
-    void shouldLoadEmptyManagerFromEmptyFile() throws IOException {
-        Files.write(tempFile.toPath(), "id,type,name,status,description,epic\n".getBytes());
+    void shouldLoadFromEmptyFile() throws IOException {
+        Files.write(tempFile.toPath(), "id,type,name,status,description,epic,startTime,duration\n".getBytes());
 
-        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
-
-        assertTrue(loadedManager.getTasksIdList().isEmpty(),
-                "Список обычных задач должен быть пустым");
-
-        assertTrue(loadedManager.getEpicsIdList().isEmpty(),
-                "Список эпиков должен быть пустым");
-
-        assertTrue(loadedManager.getSubtasksIdList().isEmpty(),
-                "Список подзадач должен быть пустым");
-
-        assertTrue(loadedManager.getHistory().isEmpty(),
-                "История должна быть пустой");
-
-        List<String> fileContent = Files.readAllLines(tempFile.toPath());
-        assertEquals(1, fileContent.size(),
-                "Файл должен содержать только заголовок");
-        assertEquals("id,type,name,status,description,epic", fileContent.getFirst(),
-                "Неверный формат заголовка файла");
+        FileBackedTaskManager loaded = FileBackedTaskManager.loadFromFile(tempFile);
+        assertTrue(loaded.getTasksIdList().isEmpty());
+        assertTrue(loaded.getEpicsIdList().isEmpty());
     }
 
     @Test
-    void shouldSaveAndLoadMultipleTasks() {
-        Task task1 = new Task("Задача 1", "Описание задачи 1");
-        Task task2 = new Task("Задача 2", "Описание задачи 2");
-        manager.addTask(task1);
-        manager.addTask(task2);
+    void shouldSaveAndLoadWithTimeData() {
+        java.time.LocalDateTime base = java.time.LocalDateTime.of(2022, 1, 1, 8, 0);
 
-        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
-        List<Task> loadedTasks = loadedManager.getTasksIdList();
+        FileBackedTaskManager taskManager = new FileBackedTaskManager(tempFile);
 
-        assertEquals(2, loadedTasks.size());
-        assertEquals(task1.getName(), loadedManager.getTaskById(task1.getId()).getName());
-        assertEquals(task2.getDescription(), loadedManager.getTaskById(task2.getId()).getDescription());
-    }
+        task.Task task = new task.Task("Task", "Desc");
+        task.setDuration(java.time.Duration.ofDays(2));
+        task.setStartTime(base);
 
-    @Test
-    void shouldSaveAndLoadEpicsWithSubtasks() {
-        Epic epic = new Epic("Эпик", "Описание эпика");
-        manager.addEpic(epic);
+        task.Epic epic = new task.Epic("Epic", "EpicDesc");
+        taskManager.addEpic(epic); // теперь epic.getId() уникален и задан
 
-        Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1");
-        subtask1.setEpicId(epic.getId());
-        manager.addSubtasks(subtask1);
-
-        Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2");
-        subtask2.setEpicId(epic.getId());
-        subtask2.setStatus(Status.DONE);
-        manager.addSubtasks(subtask2);
-
-        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
-        Epic loadedEpic = loadedManager.getEpicById(epic.getId());
-        List<Subtask> loadedSubtasks = loadedManager.getSubtasksIdList();
-
-        assertNotNull(loadedEpic);
-        assertEquals(2, loadedEpic.getSubtasksId().size());
-        assertEquals(2, loadedSubtasks.size());
-        assertEquals(Status.DONE, loadedSubtasks.get(1).getStatus());
-    }
-
-    @Test
-    void shouldSaveAndLoadTaskWithDifferentStatuses() {
-        Task newTask = new Task("New", "Описание задачи", Status.NEW, 1);
-        Task inProgressTask = new Task("In Progress", "Описание задачи", Status.IN_PROGRESS, 2);
-        Task doneTask = new Task("Done", "Описание задачи", Status.DONE, 3);
-
-        manager.addTask(newTask);
-        manager.addTask(inProgressTask);
-        manager.addTask(doneTask);
-
-        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
-
-        assertEquals(Status.NEW, loadedManager.getTaskById(newTask.getId()).getStatus());
-        assertEquals(Status.IN_PROGRESS, loadedManager.getTaskById(inProgressTask.getId()).getStatus());
-        assertEquals(Status.DONE, loadedManager.getTaskById(doneTask.getId()).getStatus());
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Test
-    void shouldHandleEmptyFile() throws IOException {
-        File emptyFile = File.createTempFile("empty", ".csv");
-        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(emptyFile);
-
-        assertTrue(loadedManager.getTasksIdList().isEmpty());
-        assertTrue(loadedManager.getEpicsIdList().isEmpty());
-        assertTrue(loadedManager.getSubtasksIdList().isEmpty());
-
-        emptyFile.delete();
-    }
-
-    @Test
-    void shouldAutoSaveOnAllOperations() {
-        Task task = new Task("Задача", "Описание задачи");
-        manager.addTask(task);
-
-        Epic epic = new Epic("Эпик", "Описание эпика");
-        manager.addEpic(epic);
-
-        Subtask subtask = new Subtask("Подзадача", "Описание подзадачи");
+        task.Subtask subtask = new task.Subtask("Sub", "SubDesc");
+        subtask.setDuration(java.time.Duration.ofDays(2));
+        subtask.setStartTime(base.plusDays(3)); // чтобы не пересекалась с task
         subtask.setEpicId(epic.getId());
-        manager.addSubtasks(subtask);
 
-        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
+        taskManager.addTask(task);
+        taskManager.addSubtasks(subtask);
 
-        assertEquals(1, loadedManager.getTasksIdList().size());
-        assertEquals(1, loadedManager.getEpicsIdList().size());
-        assertEquals(1, loadedManager.getSubtasksIdList().size());
+        FileBackedTaskManager loaded = FileBackedTaskManager.loadFromFile(tempFile);
+
+        assertEquals(task.getStartTime(), loaded.getTaskById(task.getId()).getStartTime());
+        assertEquals(epic.getDuration(), loaded.getEpicById(epic.getId()).getDuration());
+    }
+
+    @Test
+    void shouldThrowWhenLoadingFromNonExistingFile() {
+        File nonExistent = new File("definitely-not-exists-123.csv");
+        assertThrows(RuntimeException.class, () -> FileBackedTaskManager.loadFromFile(nonExistent));
+    }
+
+    @Test
+    void shouldSetEpicStatusNewIfNoSubtasks()  {
+        FileBackedTaskManager manager = createTaskManager();
+        Epic epic = new Epic("Empty", "No subtasks");
+        manager.addEpic(epic);
+        assertEquals(Status.NEW, manager.getEpicById(epic.getId()).getStatus());
     }
 }

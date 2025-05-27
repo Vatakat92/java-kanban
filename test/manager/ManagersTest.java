@@ -7,14 +7,14 @@ import org.junit.jupiter.api.Test;
 class ManagersTest {
 
     @Test
-    void shouldReturnInitializedManagerInstance() {
+    void shouldReturnInitializedManager_whenGetDefaultIsCalled() {
         TaskManager manager = Managers.getDefault();
         assertNotNull(manager);
         assertTrue(manager.getTasksIdList().isEmpty());
     }
 
     @Test
-    void shouldReturnInitializedHistoryManagerInstance() {
+    void shouldReturnInitializedHistoryManager_whenGetDefaultHistoryIsCalled() {
         HistoryManager manager = Managers.getDefaultHistory();
         assertNotNull(manager);
         assertTrue(manager.getHistory().isEmpty());

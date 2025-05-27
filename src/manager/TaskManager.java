@@ -45,5 +45,10 @@ public interface TaskManager {
 
     void updateSubtask(Subtask subtask);
 
+    List<Task> getPrioritizedTasks();
+
+    boolean hasTimeOverlap(Task newTask);
+
     List<Task> getHistory();
+
 }
