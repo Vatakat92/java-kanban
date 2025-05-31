@@ -1,7 +1,6 @@
 package manager;
 
 import task.Task;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -76,7 +75,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         historyMap.remove(taskId);
     }
 
-    @Override
     public List<Task> getHistory() {
         List<Task> historyOrdered = new ArrayList<>();
         Node currentNode = firstNode;
@@ -87,5 +85,3 @@ public class InMemoryHistoryManager implements HistoryManager {
         return historyOrdered;
     }
 }
-
-

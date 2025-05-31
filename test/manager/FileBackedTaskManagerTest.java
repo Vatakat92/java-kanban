@@ -52,11 +52,11 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
         task.setStartTime(base);
 
         task.Epic epic = new task.Epic("Epic", "EpicDesc");
-        taskManager.addEpic(epic); // теперь epic.getId() уникален и задан
+        taskManager.addEpic(epic);
 
         task.Subtask subtask = new task.Subtask("Sub", "SubDesc");
         subtask.setDuration(java.time.Duration.ofDays(2));
-        subtask.setStartTime(base.plusDays(3)); // чтобы не пересекалась с task
+        subtask.setStartTime(base.plusDays(3));
         subtask.setEpicId(epic.getId());
 
         taskManager.addTask(task);

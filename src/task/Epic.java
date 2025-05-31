@@ -6,11 +6,12 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 public class Epic extends Task {
     private final List<Integer> subtasks;
-    private transient TaskManager taskManager; // Добавляем ссылку на менеджер
+    private LocalDateTime endTime;
 
     public Epic(String name, String description) {
         super(name, description);
@@ -26,51 +27,20 @@ public class Epic extends Task {
     }
 
     public Epic(Epic epic) {
-        super(epic.getName(), epic.getDescription(), epic.getStatus(), epic.getId());
-        this.subtasks = new ArrayList<>(epic.getSubtasksId());
-        this.type = TaskType.EPIC;
-    }
-
-    public void setTaskManager(TaskManager taskManager) {
-        this.taskManager = taskManager;
-    }
-
-    @Override
-    public Duration getDuration() {
-        if (subtasks.isEmpty() || taskManager == null) return null;
-
-        return subtasks.stream()
-                .map(id -> taskManager.getSubtaskById(id))
-                .filter(Objects::nonNull)
-                .map(Subtask::getDuration)
-                .filter(Objects::nonNull)
-                .reduce(Duration.ZERO, Duration::plus);
-    }
-
-    @Override
-    public LocalDateTime getStartTime() {
-        if (subtasks.isEmpty() || taskManager == null) return null;
-
-        return subtasks.stream()
-                .map(id -> taskManager.getSubtaskById(id))
-                .filter(Objects::nonNull)
-                .map(Subtask::getStartTime)
-                .filter(Objects::nonNull)
-                .min(LocalDateTime::compareTo)
-                .orElse(null);
+        super(epic.getName(), epic.getDescription(), epic.getStatus(), epic.getId(),
+                epic.getStartTime(), epic.getDuration());
+        subtasks = new ArrayList<>(epic.getSubtasksId());
+        type = TaskType.EPIC;
+        endTime = epic.getEndTime();
     }
 
     @Override
     public LocalDateTime getEndTime() {
-        if (subtasks.isEmpty() || taskManager == null) return null;
+        return endTime;
+    }
 
-        return subtasks.stream()
-                .map(id -> taskManager.getSubtaskById(id))
-                .filter(Objects::nonNull)
-                .map(Subtask::getEndTime)
-                .filter(Objects::nonNull)
-                .max(LocalDateTime::compareTo)
-                .orElse(null);
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
     public List<Integer> getSubtasksId() {

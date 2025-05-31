@@ -9,6 +9,15 @@ import static task.Status.NEW;
 public class Task {
     protected TaskType type;
     private Integer id;
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     protected String name;
     protected String description;
     protected Status status;
@@ -30,6 +39,18 @@ public class Task {
         this.id = id;
         this.type = TaskType.TASK;
     }
+
+    public Task(String name, String description, Status status, Integer id,
+                LocalDateTime startTime, Duration duration) {
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        this.id = id;
+        this.type = TaskType.TASK;
+        this.startTime = startTime;
+        this.duration = duration;
+    }
+
 
     public Task(Task task) {
         this.name = task.getName();
@@ -90,15 +111,6 @@ public class Task {
 
     public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
-    }
-
-    public boolean isOverlapping(Task other) {
-        if (this.startTime == null || this.getEndTime() == null
-                || other == null || other.startTime == null || other.getEndTime() == null) {
-            return false;
-        }
-        return this.startTime.isBefore(other.getEndTime())
-                && other.startTime.isBefore(this.getEndTime());
     }
 
     @Override

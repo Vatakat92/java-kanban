@@ -44,11 +44,4 @@ public interface TaskManager {
     void updateEpic(Epic epic);
 
     void updateSubtask(Subtask subtask);
-
-    List<Task> getPrioritizedTasks();
-
-    boolean hasTimeOverlap(Task newTask);
-
-    List<Task> getHistory();
-
 }

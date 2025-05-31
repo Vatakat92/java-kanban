@@ -19,19 +19,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private void save() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             writer.write("id,type,name,status,description,epic,startTime,duration\n");
-
             for (Task task : tasks.values()) {
                 writer.write(taskToString(task) + "\n");
             }
-
             for (Epic epic : epics.values()) {
                 writer.write(taskToString(epic) + "\n");
             }
-
             for (Subtask subtask : subtasks.values()) {
                 writer.write(taskToString(subtask) + "\n");
             }
-
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка сохранения в файл");
         }
@@ -41,7 +37,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         if (task == null || task.getType() == null) {
             return "";
         }
-
         String[] data = {
                 String.valueOf(task.getId()),
                 task.getType().name(),
@@ -63,17 +58,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager taskManager = new FileBackedTaskManager(file);
         int loadedId = 0;
-
         List<Task> taskList = new ArrayList<>();
         List<Epic> epicList = new ArrayList<>();
         List<Subtask> subtaskList = new ArrayList<>();
-
         try {
             for (String line : Files.readAllLines(file.toPath())) {
                 if (line.isBlank() || line.startsWith("id,")) {
                     continue;
                 }
-
                 Optional<Task> parsed = taskManager.fromString(line);
                 if (parsed.isPresent()) {
                     Task actual = parsed.get();
@@ -89,32 +81,25 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     }
                 }
             }
-
             for (Epic epic : epicList) {
                 taskManager.addEpic(epic);
             }
-
             for (Task task : taskList) {
                 taskManager.addTask(task);
             }
-
             for (Subtask subtask : subtaskList) {
                 taskManager.addSubtasks(subtask);
             }
-
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка загрузки");
         }
-
         taskManager.globalId = loadedId;
-
         return taskManager;
     }
 
     private Optional<Task> fromString(String value) {
         String[] fields = value.split(",", -1);
         if (fields.length < 8) return Optional.empty();
-
         try {
             int id = Integer.parseInt(fields[0].trim());
             TaskType type = TaskType.valueOf(fields[1].trim());
@@ -125,10 +110,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             String epicIdStr = fields[5].trim();
             String startTimeStr = fields[6].trim();
             String durationStr = fields[7].trim();
-
             LocalDateTime startTime = startTimeStr.isEmpty() ? null : LocalDateTime.parse(startTimeStr);
             Duration duration = durationStr.isEmpty() ? null : Duration.ofMinutes(Long.parseLong(durationStr));
-
             switch (type) {
                 case TASK -> {
                     Task task = new Task(name, description, status, id);
@@ -156,21 +139,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     @Override
     public List<Task> getPrioritizedTasks() {
         return super.getPrioritizedTasks();
-    }
-
-    @Override
-    public boolean hasTimeOverlap(Task newTask) {
-        if (newTask.getStartTime() == null) {
-            System.out.println("Проверка задачи с null startTime: " + newTask);
-            return false;
-        }
-
-        for (Task existingTask : getPrioritizedTasks()) {
-            if (existingTask.isOverlapping(newTask)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override

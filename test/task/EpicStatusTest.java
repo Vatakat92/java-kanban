@@ -38,7 +38,8 @@ class EpicStatusTest {
         taskManager.addSubtasks(sub1);
         taskManager.addSubtasks(sub2);
 
-        assertEquals(Status.DONE, epic.getStatus());
+        Epic actualEpic = taskManager.getEpicById(epic.getId());
+        assertEquals(Status.DONE, actualEpic.getStatus());
     }
 
     @Test
@@ -48,7 +49,8 @@ class EpicStatusTest {
         taskManager.addSubtasks(sub1);
         taskManager.addSubtasks(sub2);
 
-        assertEquals(Status.IN_PROGRESS, epic.getStatus());
+        Epic actualEpic = taskManager.getEpicById(epic.getId());
+        assertEquals(Status.IN_PROGRESS, actualEpic.getStatus());
     }
 
     @Test
@@ -58,7 +60,8 @@ class EpicStatusTest {
         taskManager.addSubtasks(sub1);
         taskManager.addSubtasks(sub2);
 
-        assertEquals(Status.IN_PROGRESS, epic.getStatus());
+        Epic actualEpic = taskManager.getEpicById(epic.getId());
+        assertEquals(Status.IN_PROGRESS, actualEpic.getStatus());
     }
 
     @Test
