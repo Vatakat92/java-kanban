@@ -1,18 +1,15 @@
 package manager;
 
 import task.Task;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
-
     private final Map<Integer, Node> historyMap;
     private Node firstNode;
     private Node lastNode;
-
 
     public InMemoryHistoryManager() {
         historyMap = new HashMap<>();
@@ -22,32 +19,29 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void add(Task task) {
-
         if (task == null) {
             throw new IllegalArgumentException("Task must not be null.");
         }
-
-        Node newNode = new Node(null, null, new Task(task));
 
         if (historyMap.containsKey(task.getId())) {
             remove(task.getId());
         }
 
+        Node newNode = new Node(null, null, task);
+
         if (historyMap.isEmpty()) {
             firstNode = newNode;
-        }
-        if (lastNode != null) {
+        } else {
             lastNode.setNext(newNode);
+            newNode.setPrev(lastNode);
         }
-
-        newNode.setPrev(lastNode);
         lastNode = newNode;
+
         historyMap.put(task.getId(), newNode);
     }
 
     @Override
     public void remove(int taskId) {
-
         if (!historyMap.containsKey(taskId)) {
             return;
         }
@@ -56,42 +50,38 @@ public class InMemoryHistoryManager implements HistoryManager {
         Node prevNode = taskNode.getPrev();
         Node nextNode = taskNode.getNext();
 
-        if (taskNode.equals(lastNode)) {
-            if (prevNode != null) {
-                prevNode.setNext(null);
-                lastNode = prevNode;
+        if (taskNode == firstNode && taskNode == lastNode) {
+            firstNode = null;
+            lastNode = null;
+        } else if (taskNode == firstNode) {
+            firstNode = nextNode;
+            if (firstNode != null) {
+                firstNode.setPrev(null);
             }
-        } else if (taskNode.equals(firstNode)) {
-            if (nextNode != null) {
-                nextNode.setPrev(null);
-                firstNode = nextNode;
+        } else if (taskNode == lastNode) {
+            lastNode = prevNode;
+            if (lastNode != null) {
+                lastNode.setNext(null);
             }
         } else {
-            prevNode.setNext(nextNode);
-            nextNode.setPrev(prevNode);
+            if (prevNode != null) {
+                prevNode.setNext(nextNode);
+            }
+            if (nextNode != null) {
+                nextNode.setPrev(prevNode);
+            }
         }
 
         historyMap.remove(taskId);
     }
 
-
-    @Override
     public List<Task> getHistory() {
         List<Task> historyOrdered = new ArrayList<>();
-
-        if (historyMap.isEmpty()) {
-            return historyOrdered;
-        }
-
         Node currentNode = firstNode;
-
-        do {
+        while (currentNode != null) {
             historyOrdered.add(currentNode.getNodeTask());
             currentNode = currentNode.getNext();
-        } while (currentNode != null);
-
+        }
         return historyOrdered;
     }
 }
-
-

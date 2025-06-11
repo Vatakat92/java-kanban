@@ -44,6 +44,4 @@ public interface TaskManager {
     void updateEpic(Epic epic);
 
     void updateSubtask(Subtask subtask);
-
-    List<Task> getHistory();
 }
