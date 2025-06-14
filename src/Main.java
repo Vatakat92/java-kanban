@@ -56,7 +56,7 @@ public class Main {
         for (Epic epic : manager.getEpicsIdList()) {
             System.out.println(epic);
         }
-        for (Subtask sub : manager.getSubtasksIdList()) {
+        for (Subtask sub : manager.getSubtasksList()) {
             System.out.println(sub);
         }
 
@@ -73,7 +73,7 @@ public class Main {
         for (Epic epic : manager.getEpicsIdList()) {
             System.out.println(epic);
         }
-        for (Subtask sub : manager.getSubtasksIdList()) {
+        for (Subtask sub : manager.getSubtasksList()) {
             System.out.println(sub);
         }
 
@@ -88,7 +88,7 @@ public class Main {
         for (Epic epic : manager.getEpicsIdList()) {
             System.out.println(epic);
         }
-        for (Subtask sub : manager.getSubtasksIdList()) {
+        for (Subtask sub : manager.getSubtasksList()) {
             System.out.println(sub);
         }
     }

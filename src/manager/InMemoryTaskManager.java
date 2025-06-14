@@ -99,12 +99,12 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public List<Subtask> getSubtasksIdList() {
+    public List<Subtask> getSubtasksList() {
         return new ArrayList<>(subtasks.values());
     }
 
     public boolean hasTimeOverlap(Task newTask) {
-        if (newTask.getStartTime() == null) {
+        if (newTask.getStartTime() == null || newTask.getStartTime() == LocalDateTime.MIN) {
             return false;
         }
         for (Task existingTask : new ArrayList<>(prioritizedTasks)) {
@@ -116,7 +116,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private void updatePrioritizedTasks(Task task) {
-        if (task.getStartTime() != null) {
+        if (task.getStartTime() != null || task.getStartTime() != LocalDateTime.MIN) {
             prioritizedTasks.add(task);
         }
     }
@@ -153,7 +153,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public List<Integer> getEpicSubtasksList(Integer id) {
+    public List<Integer> getEpicSubtasksIdList(Integer id) {
         return epics.get(id).getSubtasksId();
     }
 
@@ -211,7 +211,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     private void updateEpicTime(Integer epicId) {
         if (!epics.containsKey(epicId)) {
-            throw new NoSuchElementException("Epic with id: " + epicId + " not found.");
+            throw new NoSuchElementException("Epic с идентификатором " + epicId + " не найден");
         }
         Epic epic = getEpicById(epicId);
         epic.setDuration(calculateEpicDuration(epic));
@@ -258,8 +258,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private boolean isTimeOverlapping(Task existingTask, Task newTask) {
-        if (existingTask.getStartTime() == null || existingTask.getEndTime() == null
-                || newTask == null || newTask.getStartTime() == null || newTask.getEndTime() == null) {
+        if (existingTask.getStartTime() == null || existingTask.getStartTime() == LocalDateTime.MIN ||
+                existingTask.getEndTime() == null || existingTask.getEndTime() == LocalDateTime.MIN ||
+                newTask == null ||
+                newTask.getStartTime() == null || newTask.getStartTime() == LocalDateTime.MIN ||
+                newTask.getEndTime() == null || newTask.getEndTime() == LocalDateTime.MIN) {
             return false;
         }
         return existingTask.getStartTime().isBefore(newTask.getEndTime())
@@ -303,5 +306,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     private Integer createNewId() {
         return globalId++;
+    }
+
+    public HistoryManager getHistoryManager() {
+        return historyManager;
     }
 }

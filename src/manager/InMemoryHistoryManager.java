@@ -20,7 +20,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     @Override
     public void add(Task task) {
         if (task == null) {
-            throw new IllegalArgumentException("Task must not be null.");
+            throw new IllegalArgumentException("Задача не должна быть нулевой.");
         }
 
         if (historyMap.containsKey(task.getId())) {
