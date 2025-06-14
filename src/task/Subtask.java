@@ -30,6 +30,13 @@ public class Subtask extends Task {
         this.epicId = subtask.getEpicId();
     }
 
+    public Subtask() {
+        super();
+        this.type = TaskType.SUBTASK;
+        this.status = Status.NEW;
+        this.epicId = 0;
+    }
+
     public Integer getEpicId() {
         return epicId;
     }

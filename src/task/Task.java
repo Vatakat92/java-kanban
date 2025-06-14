@@ -30,6 +30,8 @@ public class Task {
         this.type = TaskType.TASK;
         this.status = NEW;
         this.id = 0;
+        this.duration = Duration.ZERO;
+        this.startTime = LocalDateTime.MIN;
     }
 
     public Task(String name, String description, Status status, Integer id) {
@@ -38,6 +40,8 @@ public class Task {
         this.status = status;
         this.id = id;
         this.type = TaskType.TASK;
+        this.duration = Duration.ZERO;
+        this.startTime = LocalDateTime.MIN;
     }
 
     public Task(String name, String description, Status status, Integer id,
@@ -60,6 +64,16 @@ public class Task {
         this.type = TaskType.TASK;
         this.duration = task.getDuration();
         this.startTime = task.getStartTime();
+    }
+
+    public Task() {
+        this.name = "";
+        this.description = "";
+        this.type = TaskType.TASK;
+        this.status = Status.NEW;
+        this.id = 0;
+        this.duration = Duration.ZERO;
+        this.startTime = LocalDateTime.MIN;
     }
 
     public Integer getId() {
@@ -95,7 +109,7 @@ public class Task {
     }
 
     public LocalDateTime getEndTime() {
-        if (startTime == null || duration == null) {
+        if (startTime == null || duration == null || startTime == LocalDateTime.MIN || duration.isZero()) {
             return null;
         }
         return startTime.plus(duration);

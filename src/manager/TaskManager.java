@@ -23,7 +23,7 @@ public interface TaskManager {
 
     List<Epic> getEpicsIdList();
 
-    List<Subtask> getSubtasksIdList();
+    List<Subtask> getSubtasksList();
 
     Task getTaskById(Integer id);
 
@@ -31,7 +31,7 @@ public interface TaskManager {
 
     Subtask getSubtaskById(Integer id);
 
-    List<Integer> getEpicSubtasksList(Integer id);
+    List<Integer> getEpicSubtasksIdList(Integer id);
 
     void deleteTasks();
 
