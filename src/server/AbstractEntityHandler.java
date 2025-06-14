@@ -16,10 +16,15 @@ public abstract class AbstractEntityHandler<T> extends BaseHttpHandler implement
             .create();
 
     protected abstract T getById(int id);
+
     protected abstract List<T> getAll();
+
     protected abstract void add(T entity);
+
     protected abstract void update(T entity);
+
     protected abstract void removeById(int id);
+
     protected abstract void removeAll();
 
     @Override
@@ -57,7 +62,8 @@ public abstract class AbstractEntityHandler<T> extends BaseHttpHandler implement
         for (String part : pathParts) {
             try {
                 return Integer.parseInt(part);
-            } catch (NumberFormatException ignored) {}
+            } catch (NumberFormatException ignored) {
+            }
         }
         return null;
     }
@@ -132,5 +138,6 @@ public abstract class AbstractEntityHandler<T> extends BaseHttpHandler implement
     }
 
     protected abstract Class<T> getEntityClass();
+
     protected abstract Integer getId(T entity);
 }
